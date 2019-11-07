@@ -16,7 +16,7 @@
 	<bean id="igniteCacheManager" class="com.example.core.ignite.IgniteCacheManager">
 		<property name="configuration">
 			<bean class="org.apache.ignite.configuration.IgniteConfiguration">
-				<property name="gridName" value="imageSearchWeb"></property>
+				<property name="igniteInstanceName" value="imageSearchWeb"></property>
 				<property name="gridLogger">
 					<bean class="org.apache.ignite.logger.slf4j.Slf4jLogger" />
 				</property>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
-	<display-name>image-search-web-wap</display-name>
+	<display-name>image-search-demo</display-name>
 
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
@@ -34,12 +34,12 @@
 
 	<context-param>
 		<param-name>IgniteWebSessionsGridName</param-name>
-		<param-value>image-search-demo</param-value>
+		<param-value>imageSearchWeb</param-value>
 	</context-param>
 
 	<context-param>
 		<param-name>IgniteWebSessionsCacheName</param-name>
-		<param-value>image-search-demo</param-value>
+		<param-value>imageSearchWeb</param-value>
 	</context-param>
 	 
 	<!-- URL重写，用于实现伪静态 

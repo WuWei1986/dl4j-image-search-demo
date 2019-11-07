@@ -38,7 +38,7 @@ public class IgniteCacheManager implements InitializingBean, Closeable {
 		basicCacheConfiguration2.setBackups(1);
 		basicCacheConfiguration2.setAtomicityMode(CacheAtomicityMode.TRANSACTIONAL);
 		
-		String cacheName = configuration.getGridName();
+		String cacheName = configuration.getIgniteInstanceName();
 		CacheConfiguration<String, String> cacheConfiguration = new CacheConfiguration<>(basicCacheConfiguration);
 		cacheConfiguration.setName(cacheName);
 		productCache = ignite.getOrCreateCache(cacheConfiguration);

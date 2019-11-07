@@ -14,7 +14,7 @@ public class MyTest extends BaseTest {
 	
 	@Test
 	public void test(){
-		List<ProductExt> productList = imageSearchBusiness.listProduct(new File("E:/deeplearning/fashionImage/train/0faf2c5bc4292d4d.jpg"));
+		List<ProductExt> productList = imageSearchBusiness.listProduct(new File("E:/deeplearning/fashionImage/train/2c48f743fe4d714f.jpg"));
 		System.out.println(productList);
 	}
 

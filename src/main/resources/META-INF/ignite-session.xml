@@ -6,14 +6,14 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd">
 
 	<bean class="org.apache.ignite.configuration.IgniteConfiguration">
-		<property name="gridName" value="image-search-demo"></property>
+		<property name="igniteInstanceName" value="imageSearchWeb"></property>
 		<property name="metricsLogFrequency" value="0" />
 		<property name="gridLogger">
 			<bean class="org.apache.ignite.logger.slf4j.Slf4jLogger" />
 		</property>
 		<property name="cacheConfiguration">
 			<bean class="org.apache.ignite.configuration.CacheConfiguration">
-				<property name="name" value="image-search-demo" />
+				<property name="name" value="imageSearchWeb" />
 				<property name="cacheMode" value="PARTITIONED" />
 				<property name="backups" value="1" />
 			</bean>
