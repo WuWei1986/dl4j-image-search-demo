@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.1.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.1.xsd">
+
+	<!-- 业务缓存（spring注解） -->
+	<cache:annotation-driven cache-manager="cacheManager" key-generator="keyGenerator" />
+
+	<bean id="keyGenerator" class="com.example.core.cache.CacheKeyGenerator"></bean>
+
+	<bean id="cacheManager" class="com.example.core.cache.CacheManager">
+		<property name="caches">
+			<set>
+				<!-- guava cache -->
+				<ref bean="guavaCache1m" />
+				<ref bean="guavaCache10m" />
+				<ref bean="guavaCache60m" />
+				<ref bean="guavaCache1d" />
+			</set>
+		</property>
+	</bean>
+
+	<!-- guava缓存 -->
+	<bean id="guavaCache1m" class="com.example.core.cache.GuavaCacheFactoryBean">
+		<property name="name" value="guavaCache1m" />
+		<property name="spec" value="maximumSize=1000,expireAfterWrite=1m" />
+	</bean>
+	<bean id="guavaCache10m" class="com.example.core.cache.GuavaCacheFactoryBean">
+		<property name="name" value="guavaCache10m" />
+		<property name="spec" value="maximumSize=1000,expireAfterWrite=10m" />
+	</bean>
+	<bean id="guavaCache60m" class="com.example.core.cache.GuavaCacheFactoryBean">
+		<property name="name" value="guavaCache60m" />
+		<property name="spec" value="maximumSize=1000,expireAfterWrite=60m" />
+	</bean>
+	<bean id="guavaCache1d" class="com.example.core.cache.GuavaCacheFactoryBean">
+		<property name="name" value="guavaCache1d" />
+		<property name="spec" value="maximumSize=1000,expireAfterWrite=1d" />
+	</bean>
+
+</beans>

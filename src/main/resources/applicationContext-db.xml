@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util" 
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.1.xsd">
+	
+	<util:properties id="jdbcProps" location="classpath:jdbc.properties" />
+
+	<!-- ================数据源============== -->
+	<!-- 数据源父类：提供连接池配置 -->
+	<bean id="dataSourceBase" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" abstract="true">
+		<!-- 基本属性 url、user、password 
+		<property name="url" value="${main.url}" />
+		<property name="username" value="${main.username}" /> 
+		<property name="password" value="${main.password}" /> 
+		-->
+		<!-- 配置初始化大小、最小、最大 -->
+		<property name="initialSize" value="#{jdbcProps['pool.initialSize']}" />
+		<property name="minIdle" value="#{jdbcProps['pool.minIdle']}" />
+		<property name="maxActive" value="#{jdbcProps['pool.maxActive']}" />
+		<!-- 配置获取连接等待超时的时间 -->
+		<property name="maxWait" value="60000" />
+		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+		<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+		<property name="validationQuery" value="SELECT 'x'" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<!-- 打开PSCache，并且指定每个连接上PSCache的大小 
+		<property name="poolPreparedStatements" value="true" /> 
+		<property name="maxPoolPreparedStatementPerConnectionSize" value="20" /> 
+		-->
+		<!-- 配置监控统计拦截的filters -->
+		<property name="filters" value="stat,slf4j" />
+		<!-- 是否合并多个druidDataSource的统计数据 <property name="useGloalDataSourceStat" value="true" /> -->
+	</bean>
+
+	<!-- web库 -->
+	<bean id="webdb-master" parent="dataSourceBase">
+		<property name="url" value="#{jdbcProps['webdb.master.url']}"></property>
+		<property name="username" value="#{jdbcProps['webdb.master.username']}"></property>
+		<property name="password" value="#{jdbcProps['webdb.master.password']}"></property>
+	</bean>
+	<bean id="webdb-slave1" parent="dataSourceBase">
+		<property name="url" value="#{jdbcProps['webdb.slave1.url']}"></property>
+		<property name="username" value="#{jdbcProps['webdb.slave1.username']}"></property>
+		<property name="password" value="#{jdbcProps['webdb.slave1.password']}"></property>
+	</bean>
+
+	<!-- 数据源路由 -->
+	<bean id="dataSource" class="com.example.core.datasource.RoutingDataSource">
+		<property name="targetDataSources">
+			<map>
+				<entry key="webdb-master" value-ref="webdb-master"></entry>
+			</map>
+		</property>
+		<property name="defaultTargetDataSource" ref="webdb-slave1"></property>
+	</bean>
+
+	<!-- Mybatis配置 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="mapperLocations">
+			<array>
+				<value>classpath:com/example/dao/*.xml</value>
+			</array>
+		</property>
+	</bean>
+
+	<bean id="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+		<property name="basePackage" value="com.example.dao"></property>
+	</bean>
+
+	<context:annotation-config />
+	
+	<!-- 数据源自动切换拦截器 -->
+	<bean id="beanNameDatasourceAutoChanger" class="com.example.core.datasource.BeanNameDatasourceAutoChanger">
+		<property name="rules">
+			<map>
+				<entry key="webdb" value=".*"></entry>
+			</map>
+		</property>
+	</bean>
+
+	<!-- 事务管理 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<bean id="transactionInterceptor" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="transactionAttributes">
+			<props>
+				<prop key="get*">PROPAGATION_REQUIRES_NEW,ISOLATION_DEFAULT,readOnly,-java.lang.Exception
+				</prop>
+				<prop key="list*">PROPAGATION_REQUIRES_NEW,ISOLATION_DEFAULT,readOnly,-java.lang.Exception
+				</prop>
+				<prop key="count*">PROPAGATION_REQUIRES_NEW,ISOLATION_DEFAULT,readOnly,-java.lang.Exception
+				</prop>
+				<prop key="save*">PROPAGATION_REQUIRES_NEW,ISOLATION_DEFAULT,-java.lang.Exception
+				</prop>
+				<prop key="update*">PROPAGATION_REQUIRES_NEW,ISOLATION_DEFAULT,-java.lang.Exception
+				</prop>
+				<prop key="remove*">PROPAGATION_REQUIRES_NEW,ISOLATION_DEFAULT,-java.lang.Exception
+				</prop>
+			</props>
+		</property>
+	</bean>
+	<bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		<property name="beanNames">
+			<list>
+				<value>*Service</value>
+			</list>
+		</property>
+		<property name="interceptorNames">
+			<list>
+				<value>beanNameDatasourceAutoChanger</value>
+				<value>transactionInterceptor</value>
+			</list>
+		</property>
+	</bean>
+</beans>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:config="https://crnlmchina.github.io/config"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd">
+
+	<!-- 数据源 -->
+    <!-- <import resource="classpath:applicationContext-db.xml"/> -->
+	
+	<!-- 缓存 -->
+	<!-- <import resource="applicationContext-cache.xml"/> -->
+	
+	<!-- Ignite分布式缓存 -->
+	<bean id="igniteCacheManager" class="com.example.core.ignite.IgniteCacheManager">
+		<property name="configuration">
+			<bean class="org.apache.ignite.configuration.IgniteConfiguration">
+				<property name="gridName" value="imageSearchWeb"></property>
+				<property name="gridLogger">
+					<bean class="org.apache.ignite.logger.slf4j.Slf4jLogger" />
+				</property>
+				<property name="discoverySpi">
+					<bean class="org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi">
+						<property name="ipFinder">
+							<bean
+								class="org.apache.ignite.spi.discovery.tcp.ipfinder.vm.TcpDiscoveryVmIpFinder">
+								<property name="addresses"
+									value="#{T(org.springframework.util.CollectionUtils).arrayToList('127.0.0.1'.split(','))}" />
+							</bean>
+						</property>
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="imageSearchBusiness" class="com.example.business.ImageSearchBusiness" init-method="init" />
+	
+	<context:component-scan base-package="com.example.business" />
+</beans>

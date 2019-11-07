@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+    <property name="logBase" value="/log/web/service/image-search-demo" />
+    <property name="appName" value="image-search-demo" />
+
+    <include resource="logback-base.xml" />
+
+    <logger name="org.apache" level="INFO" />
+    <logger name="org.springframework" level="INFO" />
+    <root level="INFO">
+        <appender-ref ref="stdout" />
+        <appender-ref ref="ASYNC" />
+    </root>
+</configuration>
